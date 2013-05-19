@@ -32,8 +32,21 @@ struct imps2_data
 };
 #pragma pack()
 
+void usage(const char *pstrProgram)
+{
+    printf("Usage:\n"
+           "  %s <channel file>\n",
+           pstrProgram);
+}
+
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        usage(argv[0]);
+        return 1;
+    }
+
     BYTE mousedev_imps_seq[] = { 0xf3, 200, 0xf3, 100, 0xf3, 80 };
     int mice_fd = open("/dev/input/mice", O_RDWR|O_NONBLOCK);
     if (mice_fd == -1)
@@ -41,6 +54,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Open mice fail");
         return 1;
     }
+
 
     // set mice mode, so can read rolling wheels
     int nRet = write(mice_fd, mousedev_imps_seq, sizeof(mousedev_imps_seq));
@@ -50,8 +64,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    char buffer[256];
+    int nLen = snprintf(buffer, sizeof(buffer), "mplayer -quiet -softvol -softvol-max 300 -playlist %s", argv[1]);
+    buffer[nLen] = '\0';
 
-    FILE *stream = popen("mplayer -quiet -softvol -softvol-max 300 -playlist channel.txt", "w");
+    FILE *stream = popen(buffer, "w");
     if (stream == NULL || stream < 0)
     {
         fprintf(stderr, "popen mplayer fail\n");
