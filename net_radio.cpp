@@ -147,9 +147,13 @@ int main(int argc, char *argv[])
                             }
                             else if (data.btn_middle)
                             {
-                                // pause
-                                fprintf(stream, "p");
-                                fflush(stream);
+                                // ignore rolling wheels
+                                if (data.z == 0)
+                                {
+                                    // pause
+                                    fprintf(stream, "p");
+                                    fflush(stream);
+                                }
                             }
                             else if (data.z != 0)
                             {
